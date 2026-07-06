@@ -143,6 +143,7 @@
     - PowerCellsStatic
     - ElectronicsStatic
     - TentsStatic   #DEN
+    - DenHoloprojectorsStatic # DEN Shared static recipes.
   - type: EmagLatheRecipes
     emagStaticPacks:
     - SecurityAmmoStatic
