@@ -29,11 +29,10 @@
 
 - type: stack
   id: LeatherTentWall
-  name: leather tent wall
+  name: stack-leather-tent-wall
   icon: { sprite: _DEN/Objects/Tools/tent_package.rsi, state: leather_tent_package }
   spawn: LeatherTentWallStack1
   maxCount: 10
-  itemSize: 1 
 
 - type: entity
   id: ClothTentWallStack
@@ -66,11 +65,10 @@
 
 - type: stack
   id: ClothTentWall
-  name: cloth tent wall
+  name: stack-cloth-tent-wall
   icon: { sprite: _DEN/Objects/Tools/tent_package.rsi, state: cloth_tent_package }
   spawn: ClothTentWallStack1
   maxCount: 10
-  itemSize: 1
 
 - type: entity
   id: LeatherTentFlapStack
@@ -103,11 +101,10 @@
 
 - type: stack
   id: LeatherTentFlap
-  name: leather tent flap
+  name: stack-leather-tent-flap
   icon: { sprite: _DEN/Objects/Tools/tent_package.rsi, state: leather_tent_package }
   spawn: LeatherTentFlapStack1
   maxCount: 4
-  itemSize: 1
       
 - type: entity
   id: ClothTentFlapStack
@@ -140,8 +137,7 @@
 
 - type: stack
   id: ClothTentFlap
-  name: cloth tent flap
+  name: stack-cloth-tent-flap
   icon: { sprite: _DEN/Objects/Tools/tent_package.rsi, state: cloth_tent_package }
   spawn: ClothTentFlapStack1
   maxCount: 4
-  itemSize: 1
