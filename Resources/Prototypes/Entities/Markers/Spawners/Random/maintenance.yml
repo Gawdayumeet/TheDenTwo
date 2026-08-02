@@ -330,6 +330,7 @@
       - id: RifleStock
       - id: ModularReceiver
       - id: HydroponicsToolScythe
+      - id: BoxSmallFancyDerringer     #DEN
     # Rare Group
     - !type:GroupSelector
       weight: 5
@@ -358,6 +359,7 @@
       - id: ClothingHandsKnuckleDusters
       - !type:NestedSelector
         tableId: AllToyWeaponsTable
+      - id: BoxSmallFancyDerringer     #DEN
 
 - type: entity
   name: Maint Loot Spawner

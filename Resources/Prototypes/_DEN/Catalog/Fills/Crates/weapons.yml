@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 GWDYMT
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  id: CrateArmoryDerringer
+  parent: [ CrateWeaponSecure, BaseSecurityContraband ]
+  name: steel derringer giftbox crate
+  description: Contains two steel derringer giftboxes. Requires Armory access to open.
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      entity_storage: !type:AllSelector
+        children:
+        - id: BoxSmallFancyDerringer
+          amount: 2
