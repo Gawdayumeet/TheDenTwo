@@ -1,5 +1,3 @@
-#DEN
-          
 - type: entity
   name: steel derringer
   parent: [ BaseItem, BaseSecurityContraband ]
