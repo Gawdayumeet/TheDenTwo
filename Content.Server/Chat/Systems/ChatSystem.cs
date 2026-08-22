@@ -4,9 +4,7 @@ using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
-using Content.Server.Ghost;
 using Content.Server.Interaction; // DEN - Use interaction system's range checks
-using Content.Server.Speech.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Shared._DEN.Utility;
 using Content.Shared.ActionBlocker;
@@ -18,12 +16,12 @@ using Content.Shared.Ghost;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Players.RateLimiting;
 using Content.Shared.Radio;
+using Content.Shared.Speech.EntitySystems;
 using Robust.Server.Player;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
 using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Replays;
 
@@ -42,7 +40,6 @@ public sealed partial class ChatSystem : SharedChatSystem
     [Dependency] private IChatSanitizationManager _sanitizer = default!;
     [Dependency] private IAdminManager _adminManager = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
-    [Dependency] private IPrototypeManager _prototypeManager = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private IAdminLogManager _adminLogger = default!;
     [Dependency] private ActionBlockerSystem _actionBlocker = default!;
@@ -59,6 +56,8 @@ public sealed partial class ChatSystem : SharedChatSystem
     private bool _critLoocEnabled;
     private readonly bool _adminLoocEnabled = true;
 
+    private bool _deadChatEnabled = true;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -66,6 +65,7 @@ public sealed partial class ChatSystem : SharedChatSystem
         Subs.CVar(_configurationManager, CCVars.LoocEnabled, OnLoocEnabledChanged, true);
         Subs.CVar(_configurationManager, CCVars.DeadLoocEnabled, OnDeadLoocEnabledChanged, true);
         Subs.CVar(_configurationManager, CCVars.CritLoocEnabled, OnCritLoocEnabledChanged, true);
+        Subs.CVar(_configurationManager, CCVars.DeadChatEnabled, OnDeadChatEnabledChanged, true);
 
         SubscribeLocalEvent<GameRunLevelChangedEvent>(OnGameChange);
     }
@@ -96,6 +96,16 @@ public sealed partial class ChatSystem : SharedChatSystem
         _critLoocEnabled = val;
         _chatManager.DispatchServerAnnouncement(
             Loc.GetString(val ? "chat-manager-crit-looc-chat-enabled-message" : "chat-manager-crit-looc-chat-disabled-message"));
+    }
+
+    private void OnDeadChatEnabledChanged(bool val)
+    {
+        if (_deadChatEnabled == val)
+            return;
+
+        _deadChatEnabled = val;
+        _chatManager.DispatchServerAnnouncement(
+            Loc.GetString(val ? "chat-manager-dead-chat-enabled-message" : "chat-manager-dead-chat-disabled-message"));
     }
 
     private void OnGameChange(GameRunLevelChangedEvent ev)
@@ -190,13 +200,13 @@ public sealed partial class ChatSystem : SharedChatSystem
         // Capitalizing the word I only happens in English, so we check language here
         bool shouldCapitalizeTheWordI = (!CultureInfo.CurrentCulture.IsNeutralCulture && CultureInfo.CurrentCulture.Parent.Name == "en")
             || (CultureInfo.CurrentCulture.IsNeutralCulture && CultureInfo.CurrentCulture.Name == "en");
-        
+
         message = SanitizeInGameICMessage(source, message, out var emoteStr, shouldCapitalize, shouldPunctuate, shouldCapitalizeTheWordI);
 
         // DEN: Detailed message system start.
 
         message = StringUtil.FilterStringTags(message, ChatAllowedTags);
-        
+
         bool needsRadio = false;
         RadioChannelPrototype? channel = null;
         // We want to do this processing before we try to parse it into a complex message.
@@ -208,10 +218,10 @@ public sealed partial class ChatSystem : SharedChatSystem
                 message = modMessage;
             }
         }
-        
+
         var complexMessage = ConvertMessageToComplex(message);
-        
-        if (player != null 
+
+        if (player != null
             && emoteStr != message
             && emoteStr != null
             && desiredType is not InGameICChatType.Subtle)
@@ -220,7 +230,7 @@ public sealed partial class ChatSystem : SharedChatSystem
         }
 
         // DEN: Complex message will be empty, rather than a null string. Also eat any message that is only tags.
-        if (complexMessage.Parts.Count == 0 
+        if (complexMessage.Parts.Count == 0
             || complexMessage.Parts.All(part => part.Item1 is ChatPart.EmoteTag or ChatPart.DialogTag))
             return;
 
